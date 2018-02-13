@@ -18,6 +18,8 @@ logging:
         ROOT: INFO
         za.co.ajk.inventory: INFO
         io.github.jhipster: INFO
+        io.grpc.netty: ERROR
+        com.google.cloud.pubsub.v1: ERROR
 
 eureka:
     instance:
