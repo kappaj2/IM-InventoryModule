@@ -1,0 +1,90 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "equipmentActivity",
+            "otherEntityName": "equipmentActivity",
+            "otherEntityRelationshipName": "equipment"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "company",
+            "otherEntityName": "company",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "equipmentId",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "equipmentName",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "equipmentGroup",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "equipmentSerialNumber",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "equipmentBarcode",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "equipmentDescription",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "currentlyAvailable",
+            "fieldType": "Boolean",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "dateAddedToStock",
+            "fieldType": "Instant",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "addedBy",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "dateRemovedFromStock",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "removedBy",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20180221192903",
+    "entityTableName": "equipment",
+    "dto": "mapstruct",
+    "pagination": "no",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "searchEngine": "elasticsearch",
+    "angularJSSuffix": "inventory",
+    "microserviceName": "InventoryModule"
+}
