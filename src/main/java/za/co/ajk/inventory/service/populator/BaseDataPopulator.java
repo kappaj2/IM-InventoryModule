@@ -1,5 +1,6 @@
 package za.co.ajk.inventory.service.populator;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import za.co.ajk.inventory.domain.Company;
 import za.co.ajk.inventory.domain.Country;
+import za.co.ajk.inventory.domain.Equipment;
 import za.co.ajk.inventory.domain.Region;
 import za.co.ajk.inventory.repository.CompanyRepository;
 import za.co.ajk.inventory.repository.CountryRepository;
@@ -120,6 +122,59 @@ public class BaseDataPopulator implements CommandLineRunner {
     
     private void loadBaseEquipment() {
         List<EquipmentDTO> equipmentList = equipmentService.findAll();
+    
+        Equipment eq1 = new Equipment();
+        eq1.setEquipmentId(1);
+        eq1.setEquipmentName("EquipmentName1");
+        eq1.setAddedBy("Andre");
+        eq1.setCompany(ca1_1);
+        eq1.setCurrentlyAvailable(true);
+        eq1.setDateAddedToStock(Instant.now());
+        eq1.setEquipmentBarcode("Barcode111");
+        eq1.setEquipmentDescription("Test equipment 1");
+        eq1.setEquipmentSerialNumber("1234567890");
+        eq1.setEquipmentGroup("EQGroup 1");
+    
+        Equipment eq2 = new Equipment();
+        eq2.setEquipmentId(2);
+        eq2.setEquipmentName("EquipmentName2");
+        eq2.setAddedBy("Andre");
+        eq2.setCompany(ca1_1);
+        eq2.setCurrentlyAvailable(true);
+        eq2.setDateAddedToStock(Instant.now());
+        eq2.setEquipmentBarcode("Barcode112");
+        eq2.setEquipmentDescription("Test equipment 2");
+        eq2.setEquipmentSerialNumber("1234567892");
+        eq2.setEquipmentGroup("EQGroup 1");
+    
+        Equipment eq3 = new Equipment();
+        eq3.setEquipmentId(3);
+        eq3.setEquipmentName("EquipmentName3");
+        eq3.setAddedBy("Andre");
+        eq3.setCompany(ca1_1);
+        eq3.setCurrentlyAvailable(true);
+        eq3.setDateAddedToStock(Instant.now());
+        eq3.setEquipmentBarcode("Barcode113");
+        eq3.setEquipmentDescription("Test equipment 3");
+        eq3.setEquipmentSerialNumber("1234567893");
+        eq3.setEquipmentGroup("EQGroup 1");
+    
+        Equipment eq4 = new Equipment();
+        eq4.setEquipmentId(4);
+        eq4.setEquipmentName("EquipmentName4");
+        eq4.setAddedBy("Andre");
+        eq4.setCompany(ca1_2);
+        eq4.setCurrentlyAvailable(true);
+        eq4.setDateAddedToStock(Instant.now());
+        eq4.setEquipmentBarcode("Barcode114");
+        eq4.setEquipmentDescription("Test equipment 4");
+        eq4.setEquipmentSerialNumber("1234567894");
+        eq4.setEquipmentGroup("EQGroup 4");
+        
+        equipmentRepository.save(eq1);
+        equipmentRepository.save(eq2);
+        equipmentRepository.save(eq3);
+        equipmentRepository.save(eq4);
         
         equipmentRepository.findAll().stream().forEach(System.out::print);
     }
