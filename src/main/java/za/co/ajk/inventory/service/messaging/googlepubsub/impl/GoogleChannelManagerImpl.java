@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 import org.springframework.cloud.gcp.pubsub.support.GcpHeaders;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.PubsubMessage;
+import za.co.ajk.inventory.config.MessageImplementationCondition;
 import za.co.ajk.inventory.config.PubSubMessagingProperties;
 import za.co.ajk.inventory.enums.PubSubMessageType;
 import za.co.ajk.inventory.service.messaging.IMMessageProcessor;
@@ -42,6 +44,7 @@ import za.co.ajk.inventory.service.messaging.googlepubsub.GoogleChannelManager;
 
 @Component
 @Configuration
+@Conditional(MessageImplementationCondition.class)
 public class GoogleChannelManagerImpl implements GoogleChannelManager {
     
     private final Logger log = LoggerFactory.getLogger(getClass());
