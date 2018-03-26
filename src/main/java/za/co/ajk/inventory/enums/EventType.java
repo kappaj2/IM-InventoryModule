@@ -17,7 +17,8 @@ public enum EventType {
     START_EVENT("START", "Start a new event"),
     UPDATE_EVENT("UPDATE", "Update an existing event"),
     UPDATE_PRIORITY("UPDATE_PRIORITY", "Update incident priority"),
-    CLOSE_EVENT("CLOSE", "Close the event");
+    CLOSE_EVENT("CLOSE", "Close the event"),
+    GENERIC_MESSAGE("GENERIC_MESSAGE", "Generic message");
     
     private String eventTypeCode;
     private String eventDescription;

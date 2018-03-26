@@ -15,6 +15,6 @@ public class MessageImplementationCondition implements Condition {
      */
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return false;
+        return Boolean.parseBoolean(context.getEnvironment().getProperty("googlepubsub.enabled"));
     }
 }
