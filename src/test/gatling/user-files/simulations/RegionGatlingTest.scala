@@ -61,12 +61,12 @@ class RegionGatlingTest extends Simulation {
         .pause(10)
         .repeat(2) {
             exec(http("Get all regions")
-            .get("/inventorymodule/api/regions")
+            .get("/inventorymodule/api//v1regions")
             .headers(headers_http_authenticated)
             .check(status.is(200)))
             .pause(10 seconds, 20 seconds)
             .exec(http("Create new region")
-            .post("/inventorymodule/api/regions")
+            .post("/inventorymodule/api/v1/regions")
             .headers(headers_http_authenticated)
             .body(StringBody("""{"id":null, "regionCode":"SAMPLE_TEXT", "regionName":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))

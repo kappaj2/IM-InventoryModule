@@ -61,12 +61,12 @@ class CountryGatlingTest extends Simulation {
         .pause(10)
         .repeat(2) {
             exec(http("Get all countries")
-            .get("/inventorymodule/api/countries")
+            .get("/inventorymodule/api/v1/countries")
             .headers(headers_http_authenticated)
             .check(status.is(200)))
             .pause(10 seconds, 20 seconds)
             .exec(http("Create new country")
-            .post("/inventorymodule/api/countries")
+            .post("/inventorymodule/api/v1/countries")
             .headers(headers_http_authenticated)
             .body(StringBody("""{"id":null, "countryCode":"SAMPLE_TEXT", "countryName":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))

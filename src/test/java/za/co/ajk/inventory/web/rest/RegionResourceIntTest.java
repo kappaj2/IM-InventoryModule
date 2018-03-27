@@ -1,14 +1,8 @@
 package za.co.ajk.inventory.web.rest;
 
-import za.co.ajk.inventory.InventoryModuleApp;
+import java.util.List;
 
-import za.co.ajk.inventory.domain.Region;
-import za.co.ajk.inventory.repository.RegionRepository;
-import za.co.ajk.inventory.service.RegionService;
-import za.co.ajk.inventory.repository.search.RegionSearchRepository;
-import za.co.ajk.inventory.service.dto.RegionDTO;
-import za.co.ajk.inventory.service.mapper.RegionMapper;
-import za.co.ajk.inventory.web.rest.errors.ExceptionTranslator;
+import javax.persistence.EntityManager;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,14 +18,25 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import java.util.List;
+import za.co.ajk.inventory.InventoryModuleApp;
+import za.co.ajk.inventory.domain.Region;
+import za.co.ajk.inventory.repository.RegionRepository;
+import za.co.ajk.inventory.repository.search.RegionSearchRepository;
+import za.co.ajk.inventory.service.RegionService;
+import za.co.ajk.inventory.service.dto.RegionDTO;
+import za.co.ajk.inventory.service.mapper.RegionMapper;
+import za.co.ajk.inventory.web.rest.errors.ExceptionTranslator;
 
-import static za.co.ajk.inventory.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static za.co.ajk.inventory.web.rest.TestUtil.createFormattingConversionService;
 
 /**
  * Test class for the RegionResource REST controller.
@@ -113,7 +118,7 @@ public class RegionResourceIntTest {
 
         // Create the Region
         RegionDTO regionDTO = regionMapper.toDto(region);
-        restRegionMockMvc.perform(post("/api/regions")
+        restRegionMockMvc.perform(post("/api/v1/regions")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isCreated());
@@ -140,7 +145,7 @@ public class RegionResourceIntTest {
         RegionDTO regionDTO = regionMapper.toDto(region);
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restRegionMockMvc.perform(post("/api/regions")
+        restRegionMockMvc.perform(post("/api/v1/regions")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isBadRequest());
@@ -160,7 +165,7 @@ public class RegionResourceIntTest {
         // Create the Region, which fails.
         RegionDTO regionDTO = regionMapper.toDto(region);
 
-        restRegionMockMvc.perform(post("/api/regions")
+        restRegionMockMvc.perform(post("/api/v1/regions")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isBadRequest());
@@ -179,7 +184,7 @@ public class RegionResourceIntTest {
         // Create the Region, which fails.
         RegionDTO regionDTO = regionMapper.toDto(region);
 
-        restRegionMockMvc.perform(post("/api/regions")
+        restRegionMockMvc.perform(post("/api/v1/regions")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isBadRequest());
@@ -195,7 +200,7 @@ public class RegionResourceIntTest {
         regionRepository.saveAndFlush(region);
 
         // Get all the regionList
-        restRegionMockMvc.perform(get("/api/regions?sort=id,desc"))
+        restRegionMockMvc.perform(get("/api/v1/regions?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(region.getId().intValue())))
@@ -210,7 +215,7 @@ public class RegionResourceIntTest {
         regionRepository.saveAndFlush(region);
 
         // Get the region
-        restRegionMockMvc.perform(get("/api/regions/{id}", region.getId()))
+        restRegionMockMvc.perform(get("/api/v1/regions/{id}", region.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(region.getId().intValue()))
@@ -222,7 +227,7 @@ public class RegionResourceIntTest {
     @Transactional
     public void getNonExistingRegion() throws Exception {
         // Get the region
-        restRegionMockMvc.perform(get("/api/regions/{id}", Long.MAX_VALUE))
+        restRegionMockMvc.perform(get("/api/v1/regions/{id}", Long.MAX_VALUE))
             .andExpect(status().isNotFound());
     }
 
@@ -243,7 +248,7 @@ public class RegionResourceIntTest {
             .regionName(UPDATED_REGION_NAME);
         RegionDTO regionDTO = regionMapper.toDto(updatedRegion);
 
-        restRegionMockMvc.perform(put("/api/regions")
+        restRegionMockMvc.perform(put("/api/v1/regions")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isOk());
@@ -269,7 +274,7 @@ public class RegionResourceIntTest {
         RegionDTO regionDTO = regionMapper.toDto(region);
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
-        restRegionMockMvc.perform(put("/api/regions")
+        restRegionMockMvc.perform(put("/api/v1/regions")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(regionDTO)))
             .andExpect(status().isCreated());
@@ -288,7 +293,7 @@ public class RegionResourceIntTest {
         int databaseSizeBeforeDelete = regionRepository.findAll().size();
 
         // Get the region
-        restRegionMockMvc.perform(delete("/api/regions/{id}", region.getId())
+        restRegionMockMvc.perform(delete("/api/v1/regions/{id}", region.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
@@ -309,7 +314,7 @@ public class RegionResourceIntTest {
         regionSearchRepository.save(region);
 
         // Search the region
-        restRegionMockMvc.perform(get("/api/_search/regions?query=id:" + region.getId()))
+        restRegionMockMvc.perform(get("/api/v1/_search/regions?query=id:" + region.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(region.getId().intValue())))

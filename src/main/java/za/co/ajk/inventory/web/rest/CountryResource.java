@@ -1,25 +1,31 @@
 package za.co.ajk.inventory.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import za.co.ajk.inventory.service.CountryService;
-import za.co.ajk.inventory.web.rest.errors.BadRequestAlertException;
-import za.co.ajk.inventory.web.rest.util.HeaderUtil;
-import za.co.ajk.inventory.service.dto.CountryDTO;
-import io.github.jhipster.web.util.ResponseUtil;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import com.codahale.metrics.annotation.Timed;
+import io.github.jhipster.web.util.ResponseUtil;
+import za.co.ajk.inventory.service.CountryService;
+import za.co.ajk.inventory.service.dto.CountryDTO;
+import za.co.ajk.inventory.web.rest.errors.BadRequestAlertException;
+import za.co.ajk.inventory.web.rest.util.HeaderUtil;
 
 /**
  * REST controller for managing Country.
@@ -39,13 +45,13 @@ public class CountryResource {
     }
 
     /**
-     * POST  /countries : Create a new country.
+     * POST  /v1/countries : Create a new country.
      *
      * @param countryDTO the countryDTO to create
      * @return the ResponseEntity with status 201 (Created) and with body the new countryDTO, or with status 400 (Bad Request) if the country has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping("/countries")
+    @PostMapping("/v1/countries")
     @Timed
     public ResponseEntity<CountryDTO> createCountry(@Valid @RequestBody CountryDTO countryDTO) throws URISyntaxException {
         log.debug("REST request to save Country : {}", countryDTO);
@@ -53,13 +59,13 @@ public class CountryResource {
             throw new BadRequestAlertException("A new country cannot already have an ID", ENTITY_NAME, "idexists");
         }
         CountryDTO result = countryService.save(countryDTO);
-        return ResponseEntity.created(new URI("/api/countries/" + result.getId()))
+        return ResponseEntity.created(new URI("/api/v1/countries/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
     /**
-     * PUT  /countries : Updates an existing country.
+     * PUT  /v1/countries : Updates an existing country.
      *
      * @param countryDTO the countryDTO to update
      * @return the ResponseEntity with status 200 (OK) and with body the updated countryDTO,
@@ -67,7 +73,7 @@ public class CountryResource {
      * or with status 500 (Internal Server Error) if the countryDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PutMapping("/countries")
+    @PutMapping("/v1/countries")
     @Timed
     public ResponseEntity<CountryDTO> updateCountry(@Valid @RequestBody CountryDTO countryDTO) throws URISyntaxException {
         log.debug("REST request to update Country : {}", countryDTO);
@@ -81,11 +87,11 @@ public class CountryResource {
     }
 
     /**
-     * GET  /countries : get all the countries.
+     * GET  /v1/countries : get all the countries.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of countries in body
      */
-    @GetMapping("/countries")
+    @GetMapping("/v1/countries")
     @Timed
     public List<CountryDTO> getAllCountries() {
         log.debug("REST request to get all Countries");
@@ -93,12 +99,12 @@ public class CountryResource {
         }
 
     /**
-     * GET  /countries/:id : get the "id" country.
+     * GET  /v1/countries/:id : get the "id" country.
      *
      * @param id the id of the countryDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the countryDTO, or with status 404 (Not Found)
      */
-    @GetMapping("/countries/{id}")
+    @GetMapping("/v1/countries/{id}")
     @Timed
     public ResponseEntity<CountryDTO> getCountry(@PathVariable Long id) {
         log.debug("REST request to get Country : {}", id);
@@ -107,12 +113,12 @@ public class CountryResource {
     }
 
     /**
-     * DELETE  /countries/:id : delete the "id" country.
+     * DELETE  /v1/countries/:id : delete the "id" country.
      *
      * @param id the id of the countryDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @DeleteMapping("/countries/{id}")
+    @DeleteMapping("/v1/countries/{id}")
     @Timed
     public ResponseEntity<Void> deleteCountry(@PathVariable Long id) {
         log.debug("REST request to delete Country : {}", id);
@@ -121,13 +127,13 @@ public class CountryResource {
     }
 
     /**
-     * SEARCH  /_search/countries?query=:query : search for the country corresponding
+     * SEARCH  /v1/_search/countries?query=:query : search for the country corresponding
      * to the query.
      *
      * @param query the query of the country search
      * @return the result of the search
      */
-    @GetMapping("/_search/countries")
+    @GetMapping("/v1/_search/countries")
     @Timed
     public List<CountryDTO> searchCountries(@RequestParam String query) {
         log.debug("REST request to search Countries for query {}", query);

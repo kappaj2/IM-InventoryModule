@@ -1,25 +1,31 @@
 package za.co.ajk.inventory.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import za.co.ajk.inventory.service.EquipmentService;
-import za.co.ajk.inventory.web.rest.errors.BadRequestAlertException;
-import za.co.ajk.inventory.web.rest.util.HeaderUtil;
-import za.co.ajk.inventory.service.dto.EquipmentDTO;
-import io.github.jhipster.web.util.ResponseUtil;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import com.codahale.metrics.annotation.Timed;
+import io.github.jhipster.web.util.ResponseUtil;
+import za.co.ajk.inventory.service.EquipmentService;
+import za.co.ajk.inventory.service.dto.EquipmentDTO;
+import za.co.ajk.inventory.web.rest.errors.BadRequestAlertException;
+import za.co.ajk.inventory.web.rest.util.HeaderUtil;
 
 /**
  * REST controller for managing Equipment.
@@ -39,13 +45,13 @@ public class EquipmentResource {
     }
 
     /**
-     * POST  /equipment : Create a new equipment.
+     * POST  /v1/equipment : Create a new equipment.
      *
      * @param equipmentDTO the equipmentDTO to create
      * @return the ResponseEntity with status 201 (Created) and with body the new equipmentDTO, or with status 400 (Bad Request) if the equipment has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PostMapping("/equipment")
+    @PostMapping("/v1/equipment")
     @Timed
     public ResponseEntity<EquipmentDTO> createEquipment(@Valid @RequestBody EquipmentDTO equipmentDTO) throws URISyntaxException {
         log.debug("REST request to save Equipment : {}", equipmentDTO);
@@ -53,13 +59,13 @@ public class EquipmentResource {
             throw new BadRequestAlertException("A new equipment cannot already have an ID", ENTITY_NAME, "idexists");
         }
         EquipmentDTO result = equipmentService.save(equipmentDTO);
-        return ResponseEntity.created(new URI("/api/equipment/" + result.getId()))
+        return ResponseEntity.created(new URI("/api/v1/equipment/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
     /**
-     * PUT  /equipment : Updates an existing equipment.
+     * PUT  /v1/equipment : Updates an existing equipment.
      *
      * @param equipmentDTO the equipmentDTO to update
      * @return the ResponseEntity with status 200 (OK) and with body the updated equipmentDTO,
@@ -67,7 +73,7 @@ public class EquipmentResource {
      * or with status 500 (Internal Server Error) if the equipmentDTO couldn't be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @PutMapping("/equipment")
+    @PutMapping("/v1/equipment")
     @Timed
     public ResponseEntity<EquipmentDTO> updateEquipment(@Valid @RequestBody EquipmentDTO equipmentDTO) throws URISyntaxException {
         log.debug("REST request to update Equipment : {}", equipmentDTO);
@@ -81,11 +87,11 @@ public class EquipmentResource {
     }
 
     /**
-     * GET  /equipment : get all the equipment.
+     * GET  /v1/equipment : get all the equipment.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of equipment in body
      */
-    @GetMapping("/equipment")
+    @GetMapping("/v1/equipment")
     @Timed
     public List<EquipmentDTO> getAllEquipment() {
         log.debug("REST request to get all Equipment");
@@ -93,12 +99,12 @@ public class EquipmentResource {
         }
 
     /**
-     * GET  /equipment/:id : get the "id" equipment.
+     * GET  /v1/equipment/:id : get the "id" equipment.
      *
      * @param id the id of the equipmentDTO to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the equipmentDTO, or with status 404 (Not Found)
      */
-    @GetMapping("/equipment/{id}")
+    @GetMapping("/v1/equipment/{id}")
     @Timed
     public ResponseEntity<EquipmentDTO> getEquipment(@PathVariable Long id) {
         log.debug("REST request to get Equipment : {}", id);
@@ -107,12 +113,12 @@ public class EquipmentResource {
     }
 
     /**
-     * DELETE  /equipment/:id : delete the "id" equipment.
+     * DELETE  /v1/equipment/:id : delete the "id" equipment.
      *
      * @param id the id of the equipmentDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @DeleteMapping("/equipment/{id}")
+    @DeleteMapping("/v1/equipment/{id}")
     @Timed
     public ResponseEntity<Void> deleteEquipment(@PathVariable Long id) {
         log.debug("REST request to delete Equipment : {}", id);
@@ -121,13 +127,13 @@ public class EquipmentResource {
     }
 
     /**
-     * SEARCH  /_search/equipment?query=:query : search for the equipment corresponding
+     * SEARCH  /v1/_search/equipment?query=:query : search for the equipment corresponding
      * to the query.
      *
      * @param query the query of the equipment search
      * @return the result of the search
      */
-    @GetMapping("/_search/equipment")
+    @GetMapping("/v1/_search/equipment")
     @Timed
     public List<EquipmentDTO> searchEquipment(@RequestParam String query) {
         log.debug("REST request to search Equipment for query {}", query);

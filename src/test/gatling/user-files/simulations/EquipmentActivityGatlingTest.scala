@@ -61,12 +61,12 @@ class EquipmentActivityGatlingTest extends Simulation {
         .pause(10)
         .repeat(2) {
             exec(http("Get all equipmentActivities")
-            .get("/inventorymodule/api/equipment-activities")
+            .get("/inventorymodule/api/v1/equipment-activities")
             .headers(headers_http_authenticated)
             .check(status.is(200)))
             .pause(10 seconds, 20 seconds)
             .exec(http("Create new equipmentActivity")
-            .post("/inventorymodule/api/equipment-activities")
+            .post("/inventorymodule/api/v1/equipment-activities")
             .headers(headers_http_authenticated)
             .body(StringBody("""{"id":null, "activityTypeCode":"SAMPLE_TEXT", "activityDescription":"SAMPLE_TEXT", "activityDate":"2020-01-01T00:00:00.000Z", "activityBy":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))

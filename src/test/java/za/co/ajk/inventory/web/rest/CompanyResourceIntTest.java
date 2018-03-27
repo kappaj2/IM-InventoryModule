@@ -1,14 +1,8 @@
 package za.co.ajk.inventory.web.rest;
 
-import za.co.ajk.inventory.InventoryModuleApp;
+import java.util.List;
 
-import za.co.ajk.inventory.domain.Company;
-import za.co.ajk.inventory.repository.CompanyRepository;
-import za.co.ajk.inventory.service.CompanyService;
-import za.co.ajk.inventory.repository.search.CompanySearchRepository;
-import za.co.ajk.inventory.service.dto.CompanyDTO;
-import za.co.ajk.inventory.service.mapper.CompanyMapper;
-import za.co.ajk.inventory.web.rest.errors.ExceptionTranslator;
+import javax.persistence.EntityManager;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,14 +18,25 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import java.util.List;
+import za.co.ajk.inventory.InventoryModuleApp;
+import za.co.ajk.inventory.domain.Company;
+import za.co.ajk.inventory.repository.CompanyRepository;
+import za.co.ajk.inventory.repository.search.CompanySearchRepository;
+import za.co.ajk.inventory.service.CompanyService;
+import za.co.ajk.inventory.service.dto.CompanyDTO;
+import za.co.ajk.inventory.service.mapper.CompanyMapper;
+import za.co.ajk.inventory.web.rest.errors.ExceptionTranslator;
 
-import static za.co.ajk.inventory.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static za.co.ajk.inventory.web.rest.TestUtil.createFormattingConversionService;
 
 /**
  * Test class for the CompanyResource REST controller.
@@ -113,7 +118,7 @@ public class CompanyResourceIntTest {
 
         // Create the Company
         CompanyDTO companyDTO = companyMapper.toDto(company);
-        restCompanyMockMvc.perform(post("/api/companies")
+        restCompanyMockMvc.perform(post("/api/v1/companies")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(companyDTO)))
             .andExpect(status().isCreated());
@@ -140,7 +145,7 @@ public class CompanyResourceIntTest {
         CompanyDTO companyDTO = companyMapper.toDto(company);
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restCompanyMockMvc.perform(post("/api/companies")
+        restCompanyMockMvc.perform(post("/api/v1/companies")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(companyDTO)))
             .andExpect(status().isBadRequest());
@@ -160,7 +165,7 @@ public class CompanyResourceIntTest {
         // Create the Company, which fails.
         CompanyDTO companyDTO = companyMapper.toDto(company);
 
-        restCompanyMockMvc.perform(post("/api/companies")
+        restCompanyMockMvc.perform(post("/api/v1/companies")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(companyDTO)))
             .andExpect(status().isBadRequest());
@@ -176,7 +181,7 @@ public class CompanyResourceIntTest {
         companyRepository.saveAndFlush(company);
 
         // Get all the companyList
-        restCompanyMockMvc.perform(get("/api/companies?sort=id,desc"))
+        restCompanyMockMvc.perform(get("/api/v1/companies?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(company.getId().intValue())))
@@ -191,7 +196,7 @@ public class CompanyResourceIntTest {
         companyRepository.saveAndFlush(company);
 
         // Get the company
-        restCompanyMockMvc.perform(get("/api/companies/{id}", company.getId()))
+        restCompanyMockMvc.perform(get("/api/v1/companies/{id}", company.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(company.getId().intValue()))
@@ -203,7 +208,7 @@ public class CompanyResourceIntTest {
     @Transactional
     public void getNonExistingCompany() throws Exception {
         // Get the company
-        restCompanyMockMvc.perform(get("/api/companies/{id}", Long.MAX_VALUE))
+        restCompanyMockMvc.perform(get("/api/v1/companies/{id}", Long.MAX_VALUE))
             .andExpect(status().isNotFound());
     }
 
@@ -224,7 +229,7 @@ public class CompanyResourceIntTest {
             .branchCode(UPDATED_BRANCH_CODE);
         CompanyDTO companyDTO = companyMapper.toDto(updatedCompany);
 
-        restCompanyMockMvc.perform(put("/api/companies")
+        restCompanyMockMvc.perform(put("/api/v1/companies")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(companyDTO)))
             .andExpect(status().isOk());
@@ -250,7 +255,7 @@ public class CompanyResourceIntTest {
         CompanyDTO companyDTO = companyMapper.toDto(company);
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
-        restCompanyMockMvc.perform(put("/api/companies")
+        restCompanyMockMvc.perform(put("/api/v1/companies")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(companyDTO)))
             .andExpect(status().isCreated());
@@ -269,7 +274,7 @@ public class CompanyResourceIntTest {
         int databaseSizeBeforeDelete = companyRepository.findAll().size();
 
         // Get the company
-        restCompanyMockMvc.perform(delete("/api/companies/{id}", company.getId())
+        restCompanyMockMvc.perform(delete("/api/v1/companies/{id}", company.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
@@ -290,7 +295,7 @@ public class CompanyResourceIntTest {
         companySearchRepository.save(company);
 
         // Search the company
-        restCompanyMockMvc.perform(get("/api/_search/companies?query=id:" + company.getId()))
+        restCompanyMockMvc.perform(get("/api/v1/_search/companies?query=id:" + company.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(company.getId().intValue())))

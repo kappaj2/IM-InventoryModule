@@ -1,14 +1,8 @@
 package za.co.ajk.inventory.web.rest;
 
-import za.co.ajk.inventory.InventoryModuleApp;
+import java.util.List;
 
-import za.co.ajk.inventory.domain.Country;
-import za.co.ajk.inventory.repository.CountryRepository;
-import za.co.ajk.inventory.service.CountryService;
-import za.co.ajk.inventory.repository.search.CountrySearchRepository;
-import za.co.ajk.inventory.service.dto.CountryDTO;
-import za.co.ajk.inventory.service.mapper.CountryMapper;
-import za.co.ajk.inventory.web.rest.errors.ExceptionTranslator;
+import javax.persistence.EntityManager;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,14 +18,25 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import java.util.List;
+import za.co.ajk.inventory.InventoryModuleApp;
+import za.co.ajk.inventory.domain.Country;
+import za.co.ajk.inventory.repository.CountryRepository;
+import za.co.ajk.inventory.repository.search.CountrySearchRepository;
+import za.co.ajk.inventory.service.CountryService;
+import za.co.ajk.inventory.service.dto.CountryDTO;
+import za.co.ajk.inventory.service.mapper.CountryMapper;
+import za.co.ajk.inventory.web.rest.errors.ExceptionTranslator;
 
-import static za.co.ajk.inventory.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static za.co.ajk.inventory.web.rest.TestUtil.createFormattingConversionService;
 
 /**
  * Test class for the CountryResource REST controller.
@@ -113,7 +118,7 @@ public class CountryResourceIntTest {
 
         // Create the Country
         CountryDTO countryDTO = countryMapper.toDto(country);
-        restCountryMockMvc.perform(post("/api/countries")
+        restCountryMockMvc.perform(post("/api/v1/countries")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isCreated());
@@ -140,7 +145,7 @@ public class CountryResourceIntTest {
         CountryDTO countryDTO = countryMapper.toDto(country);
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restCountryMockMvc.perform(post("/api/countries")
+        restCountryMockMvc.perform(post("/api/v1/countries")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isBadRequest());
@@ -160,7 +165,7 @@ public class CountryResourceIntTest {
         // Create the Country, which fails.
         CountryDTO countryDTO = countryMapper.toDto(country);
 
-        restCountryMockMvc.perform(post("/api/countries")
+        restCountryMockMvc.perform(post("/api/v1/countries")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isBadRequest());
@@ -179,7 +184,7 @@ public class CountryResourceIntTest {
         // Create the Country, which fails.
         CountryDTO countryDTO = countryMapper.toDto(country);
 
-        restCountryMockMvc.perform(post("/api/countries")
+        restCountryMockMvc.perform(post("/api/v1/countries")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isBadRequest());
@@ -195,7 +200,7 @@ public class CountryResourceIntTest {
         countryRepository.saveAndFlush(country);
 
         // Get all the countryList
-        restCountryMockMvc.perform(get("/api/countries?sort=id,desc"))
+        restCountryMockMvc.perform(get("/api/v1/countries?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
@@ -210,7 +215,7 @@ public class CountryResourceIntTest {
         countryRepository.saveAndFlush(country);
 
         // Get the country
-        restCountryMockMvc.perform(get("/api/countries/{id}", country.getId()))
+        restCountryMockMvc.perform(get("/api/v1/countries/{id}", country.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(country.getId().intValue()))
@@ -222,7 +227,7 @@ public class CountryResourceIntTest {
     @Transactional
     public void getNonExistingCountry() throws Exception {
         // Get the country
-        restCountryMockMvc.perform(get("/api/countries/{id}", Long.MAX_VALUE))
+        restCountryMockMvc.perform(get("/api/v1/countries/{id}", Long.MAX_VALUE))
             .andExpect(status().isNotFound());
     }
 
@@ -243,7 +248,7 @@ public class CountryResourceIntTest {
             .countryName(UPDATED_COUNTRY_NAME);
         CountryDTO countryDTO = countryMapper.toDto(updatedCountry);
 
-        restCountryMockMvc.perform(put("/api/countries")
+        restCountryMockMvc.perform(put("/api/v1/countries")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isOk());
@@ -269,7 +274,7 @@ public class CountryResourceIntTest {
         CountryDTO countryDTO = countryMapper.toDto(country);
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
-        restCountryMockMvc.perform(put("/api/countries")
+        restCountryMockMvc.perform(put("/api/v1/countries")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(countryDTO)))
             .andExpect(status().isCreated());
@@ -288,7 +293,7 @@ public class CountryResourceIntTest {
         int databaseSizeBeforeDelete = countryRepository.findAll().size();
 
         // Get the country
-        restCountryMockMvc.perform(delete("/api/countries/{id}", country.getId())
+        restCountryMockMvc.perform(delete("/api/v1/countries/{id}", country.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
@@ -309,7 +314,7 @@ public class CountryResourceIntTest {
         countrySearchRepository.save(country);
 
         // Search the country
-        restCountryMockMvc.perform(get("/api/_search/countries?query=id:" + country.getId()))
+        restCountryMockMvc.perform(get("/api/v1/_search/countries?query=id:" + country.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(country.getId().intValue())))
